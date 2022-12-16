@@ -5,8 +5,13 @@ import termsData from "./db/terms.json" assert { type: "json" };
 const app = express();
 const port = 3001;
 
+// TODO: use query parameters to allow an option to sort the terms either ascending or descending
 // gets file from a "database"
-app.get("/api/terms", (_, res) => {
+app.get("/api/terms", (req, res) => {
+  // request.query is an object that comes from the user entered key value pairs
+  // http://localhost:3001/api/terms?student=josh console.log comes back as {student: josh}
+  console.log(req.query);
+
   res.json(termsData);
 });
 
