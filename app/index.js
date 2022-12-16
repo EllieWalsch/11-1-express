@@ -8,11 +8,23 @@ const port = 3001;
 // TODO: use query parameters to allow an option to sort the terms either ascending or descending
 // gets file from a "database"
 app.get("/api/terms", (req, res) => {
-  // request.query is an object that comes from the user entered key value pairs
-  // http://localhost:3001/api/terms?student=josh console.log comes back as {student: josh}
-  console.log(req.query);
+  // get the value of the sort query from the request
+  const { sort } = req.query;
 
-  res.json(termsData);
+  let ret;
+
+  switch (sort) {
+    case "asc":
+      ret = termsData.sort((a, b) => a.term.localeCompare(b.term));
+      break;
+    case "desc":
+      ret = termsData.sort((a, b) => b.term.localeCompare(a.term));
+      break;
+    default:
+      ret = termsData;
+  }
+
+  res.json(ret);
 });
 
 // ":term" means route can be whatever the user wants
