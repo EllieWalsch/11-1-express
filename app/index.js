@@ -1,3 +1,4 @@
+import cors from "cors";
 import express from "express";
 import termsData from "./db/terms.json" assert { type: "json" };
 
@@ -5,9 +6,8 @@ import termsData from "./db/terms.json" assert { type: "json" };
 const app = express();
 const port = 3001;
 
-// TODO: use query parameters to allow an option to sort the terms either ascending or descending
 // gets file from a "database"
-app.get("/api/terms", (req, res) => {
+app.get("/api/terms", cors({ origin: "http://localhost:5173" }), (req, res) => {
   // get the value of the sort query from the request
   const { sort } = req.query;
 
