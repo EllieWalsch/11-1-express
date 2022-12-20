@@ -1,14 +1,17 @@
 import cors from "cors";
 import express from "express";
+import petsData from "./db/pets.json" assert { type: "json" };
+import reviewsData from "./db/reviews.json" assert { type: "json" };
 import termsData from "./db/terms.json" assert { type: "json" };
 
 // Start express
 const app = express();
+
+// TODO: Get port from environment variables (via config)
 const port = 3001;
 
-// gets file from a "database"
 app.get("/api/terms", cors({ origin: "http://localhost:5173" }), (req, res) => {
-  // get the value of the sort query from the request
+  // This will be either 'asc' or 'desc'
   const { sort } = req.query;
 
   let ret;
@@ -27,25 +30,15 @@ app.get("/api/terms", cors({ origin: "http://localhost:5173" }), (req, res) => {
   res.json(ret);
 });
 
-// ":term" means route can be whatever the user wants
-// the colon represents a dynamic parameter
-// eg: /api/terms/whateverIwant
-
-// what follows the : (the parameter) is what will show up as the key in the
-// request.params
-
+// The ':' represents a DYNAMIC PARAMETER. (e.g. '/api/terms/WHATEVERIWANT')
+// We can see the name of this parameter as a key in the 'req.params.'
 app.get("/api/terms/:term", (req, res) => {
-  // get the desired term from the req.params
   const { term } = req.params;
 
-  // find the desired term in the array
   const requestedTerm = termsData.find(
     (t) => t.term.toUpperCase() === term.toUpperCase()
   );
 
-  // if we find the term, send it back as JSON
-  // else, tell them we did not find it
-  // 404 mean user made a bad request
   if (requestedTerm) {
     res.json(requestedTerm);
   } else {
@@ -53,8 +46,44 @@ app.get("/api/terms/:term", (req, res) => {
   }
 });
 
-// start the server
-// npm start
+app.get("/api/pets", cors({ origin: "http://localhost:5173" }), (_, res) => {
+  res.json(petsData);
+});
+
+app.get("/api/reviews", (_, res) => {
+  res.json(reviewsData);
+});
+
+app.get("/api/reviews/:id", (req, res) => {
+  const { id } = req.params;
+
+  // Find the review whose 'review_id' matches the id from the DYNAMIC PARAMETER in 'req.params'
+  const requestedReview = reviewsData.find((review) => review.review_id === id);
+
+  if (requestedReview) {
+    res.json(requestedReview);
+  } else {
+    res.status(404).json({ error: `Review ${id} not found. :(` });
+  }
+});
+
+app.get("/api/reviews/:id/upvotes", (req, res) => {
+  const { id } = req.params;
+
+  // Find the review whose 'review_id' matches the id from the DYNAMIC PARAMETER in 'req.params'
+  const requestedReview = reviewsData.find((review) => review.review_id === id);
+
+  if (requestedReview) {
+    res.json({ upvotes: requestedReview.upvotes });
+  } else {
+    res.status(404).json({ error: `Review ${id} not found. :(` });
+  }
+});
+
+// TODO: POST request to add a review
+
+// TODO: PUT request to upvote a review
+
 app.listen(port, () => {
-  console.info("server running on 3001");
+  console.info("Server running on port 3001");
 });
